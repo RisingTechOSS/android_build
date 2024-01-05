@@ -210,11 +210,8 @@ function check_product()
         echo "Couldn't locate the top of the tree.  Try setting TOP." >&2
         return
     fi
-    if (echo -n $1 | grep -q -e "^lineage_") ; then
-        LINEAGE_BUILD=$(echo -n $1 | sed -e 's/^lineage_//g')
-    else
-        LINEAGE_BUILD=
-    fi
+    target_device="$(get_build_var TARGET_DEVICE)"
+    LINEAGE_BUILD="$target_device"
     export LINEAGE_BUILD
 
         TARGET_PRODUCT=$1 \
@@ -830,21 +827,6 @@ function lunch()
         echo
         echo "Invalid lunch combo: $selection"
         return 1
-    fi
-
-    if ! check_product $product
-    then
-        # if we can't find a product, try to grab it off the LineageOS GitHub
-        T=$(gettop)
-        cd $T > /dev/null
-        vendor/lineage/build/tools/roomservice.py $product
-        cd - > /dev/null
-        check_product $product
-    else
-        T=$(gettop)
-        cd $T > /dev/null
-        vendor/lineage/build/tools/roomservice.py $product true
-        cd - > /dev/null
     fi
 
     TARGET_PRODUCT=$product \
@@ -2146,6 +2128,7 @@ function setup_ccache() {
 
 function makecleankernel()
 {
+    check_product
     local TARGET_KERNEL_OUTPUT_DIR="out/target/product/*/obj/KERNEL_OBJ"
     rm -rf $TARGET_KERNEL_OUTPUT_DIR
     echo "Removing kernel artifacts from $TARGET_KERNEL_OUTPUT_DIR" >&2
