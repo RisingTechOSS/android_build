@@ -2241,7 +2241,69 @@ function check_fastboot() {
   return $?
 }
 
+function cherryPick() {
+    repo_dir="$1"
+    remote_url="$2"
+    change_ref="$3"
+    git -C "$repo_dir" fetch "$remote_url" "$change_ref" > /dev/null 2>&1 &&
+    git -C "$repo_dir" cherry-pick FETCH_HEAD > /dev/null 2>&1
+    if [ $? -eq 0 ]; then
+        echo "Patch: $commit successfuly applied in $repo_dir"
+    else
+        git -C "$repo_dir" cherry-pick --skip > /dev/null 2>&1
+        echo "Patch: $commit already applied for $repo_dir. Skipping automated patching"
+    fi
+}
+
+function cherryPickSha() {
+    repo_dir="$1"
+    remote_url="$2"
+    sha1sha2="$3"
+    commits=$(git -C "$repo_dir" log --format="%H" "$sha1sha2")
+    for commit in $commits; do
+        git -C "$repo_dir" fetch "$remote_url" > /dev/null 2>&1 &&
+        git -C "$repo_dir" cherry-pick "$commit" > /dev/null 2>&1
+        if [ $? -eq 0 ]; then
+            echo "Patch: $commit successfuly applied in $repo_dir"
+        else
+            git -C "$repo_dir" cherry-pick --skip > /dev/null 2>&1
+            echo "Patch: $commit already applied for $repo_dir. Skipping automated patching"
+        fi
+    done
+}
+
+function setUpAfdoPatches() {
+    current_dir=$(pwd)
+
+    if [ -z "$TARGET_SKIP_AFDO_PATCHING" ] || [ "$TARGET_SKIP_AFDO_PATCHING" != "true" ]; then
+        cat <<EOF
+====================================================================
+           Starting Automated AutoAFDO/LTO/PGO Patching
+====================================================================
+EOF
+
+        cherryPick "external/sqlite" "https://android.googlesource.com/platform/external/sqlite" "refs/changes/02/2845002/2" &&
+        cherryPick "system/server_configurable_flags" "https://android.googlesource.com/platform/system/server_configurable_flags" "refs/changes/85/2844985/2" &&
+        cherryPick "external/boringssl" "https://android.googlesource.com/platform/external/boringssl" "refs/changes/06/2854406/2" &&
+        cherryPick "system/linkerconfig" "https://android.googlesource.com/platform/system/linkerconfig" "refs/changes/51/2855451/1" &&
+        cherryPickSha "build/bazel" "https://github.com/minaripenguin/android_build_bazel" "6de40452f0c7b50d692f4a7074cfec637d293853..e2c53f8cedd165510c3781563d370aa6e99af84b" &&
+        cherryPickSha "toolchain/pgo-profiles" "https://github.com/minaripenguin/android_toolchain_pgo-profiles" "c2fe679f69cdc508e8af665352ff54774b130817..d359806aca605184d5f7413bf0630320ce87eb59"
+        export TARGET_SKIP_AFDO_PATCHING=true
+
+        cat <<EOF
+====================================================================
+                AutoAFDO/LTO/PGO Patches Applied
+====================================================================
+EOF
+    else
+        echo "Skipping automated patching (TARGET_SKIP_AFDO_PATCHING was set to true)"
+    fi
+
+    cd "$current_dir" || exit
+}
+
 setup_ccache
+setUpAfdoPatches
 validate_current_shell
 set_global_paths
 source_vendorsetup
