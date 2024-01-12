@@ -2297,6 +2297,7 @@ function setUpOptimizationPatches() {
 ====================================================================
 EOF
 
+        mergePick "external/arm-optimized-routines" "https://github.com/ARM-software/optimized-routines" "" &&
         cherryPick "packages/MusicFX" "https://android.googlesource.com/platform/packages/MusicFX" "refs/changes/34/2736934/3" &&
         cherryPick "system/server_configurable_flags" "https://android.googlesource.com/platform/system/server_configurable_flags" "refs/changes/85/2844985/2" &&
         cherryPick "external/boringssl" "https://android.googlesource.com/platform/external/boringssl" "refs/changes/06/2854406/2" &&
