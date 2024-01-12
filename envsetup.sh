@@ -2297,12 +2297,14 @@ function setUpOptimizationPatches() {
 ====================================================================
 EOF
 
+        cherryPick "packages/MusicFX" "https://android.googlesource.com/platform/packages/MusicFX" "refs/changes/34/2736934/3" &&
         cherryPick "system/server_configurable_flags" "https://android.googlesource.com/platform/system/server_configurable_flags" "refs/changes/85/2844985/2" &&
         cherryPick "external/boringssl" "https://android.googlesource.com/platform/external/boringssl" "refs/changes/06/2854406/2" &&
         cherryPick "system/linkerconfig" "https://android.googlesource.com/platform/system/linkerconfig" "refs/changes/51/2855451/1" &&
         cherryPick "prebuilts/abi-dumps/ndk" "https://android.googlesource.com/platform/prebuilts/abi-dumps/ndk" "refs/changes/39/2902239/2" &&
         cherryPickSha "external/sqlite" "https://github.com/minaripenguin/android_external_sqlite" "160f0f83cb3a07278500acbea73c6dcff7f178f0^..dc255e90cfd1215e8c941122e74a1ca7a839d37a" &&
         cherryPickSha "build/bazel" "https://github.com/minaripenguin/android_build_bazel" "6de40452f0c7b50d692f4a7074cfec637d293853^..e2c53f8cedd165510c3781563d370aa6e99af84b" &&
+        cherryPickSha "hardware/interfaces" "https://github.com/minaripenguin/android_hardware_interfaces" "d1d0b6b21992451def6c6c8e3f4229f0a783ea38^..2e64344c74bb11e55bb80152080f3c2427cba9a4" &&
         cherryPickSha "toolchain/pgo-profiles" "https://github.com/minaripenguin/android_toolchain_pgo-profiles" "c2fe679f69cdc508e8af665352ff54774b130817^..d359806aca605184d5f7413bf0630320ce87eb59" &&
         mergePick "external/zlib" "https://android.googlesource.com/platform/external/zlib" "refs/changes/73/2901473/1" &&
         cherryPickSha "external/zlib" "https://github.com/minaripenguin/android_external_zlib" "922d92dd206ce0b311e523695645be2a9864197a^..6510619fc778ac3a5ebdedef71ea942fdee430b4"
