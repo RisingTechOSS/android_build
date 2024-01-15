@@ -2287,7 +2287,7 @@ function cherryPickSha() {
     done
 }
 
-function setUpOptimizationPatches() {
+function opt_patch() {
     current_dir=$(pwd)
 
     if [ -z "$TARGET_SKIP_ROM_OPTIMIZATION_PATCHING" ] || [ "$TARGET_SKIP_ROM_OPTIMIZATION_PATCHING" != "true" ]; then
@@ -2309,7 +2309,6 @@ EOF
         cherryPickSha "toolchain/pgo-profiles" "https://github.com/minaripenguin/android_toolchain_pgo-profiles" "c2fe679f69cdc508e8af665352ff54774b130817^..d359806aca605184d5f7413bf0630320ce87eb59" &&
         mergePick "external/zlib" "https://android.googlesource.com/platform/external/zlib" "refs/changes/73/2901473/1" &&
         cherryPickSha "external/zlib" "https://github.com/minaripenguin/android_external_zlib" "922d92dd206ce0b311e523695645be2a9864197a^..6510619fc778ac3a5ebdedef71ea942fdee430b4"
-        export TARGET_SKIP_ROM_OPTIMIZATION_PATCHING=true
 
         cat <<EOF
 ====================================================================
@@ -2324,7 +2323,6 @@ EOF
 }
 
 setup_ccache
-setUpOptimizationPatches
 validate_current_shell
 set_global_paths
 source_vendorsetup
