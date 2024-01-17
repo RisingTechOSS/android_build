@@ -2270,16 +2270,22 @@ function cherryPick() {
     fi
 }
 
+function fetchRemote() {
+    repo_dir="$1"
+    remote_url="$2"
+    git -C "$repo_dir" fetch "$remote_url"  > /dev/null 2>&1 &&
+    echo "Remote Fetched successfuly for $repo_dir"
+}
+
 function cherryPickSha() {
     repo_dir="$1"
     remote_url="$2"
     sha1sha2="$3"
+    fetchRemote "$repo_dir" "$remote_url" && 
     commits=$(git -C "$repo_dir" log --format="%H" "$sha1sha2")
     for commit in $commits; do
-        git -C "$repo_dir" fetch "$remote_url" > /dev/null 2>&1 &&
-        git -C "$repo_dir" cherry-pick "$commit" > /dev/null 2>&1
-        if [ $? -eq 0 ]; then
-            echo "Patch: $commit successfuly applied in $repo_dir"
+        if git -C "$repo_dir" cherry-pick "$commit" > /dev/null 2>&1; then
+            echo "Patch: $commit successfully applied in $repo_dir"
         else
             git -C "$repo_dir" cherry-pick --skip > /dev/null 2>&1
             echo "Patch: $commit already applied for $repo_dir. Skipping automated patching"
@@ -2308,7 +2314,7 @@ EOF
         cherryPickSha "hardware/interfaces" "https://github.com/minaripenguin/android_hardware_interfaces" "d1d0b6b21992451def6c6c8e3f4229f0a783ea38^..2e64344c74bb11e55bb80152080f3c2427cba9a4" &&
         cherryPickSha "toolchain/pgo-profiles" "https://github.com/minaripenguin/android_toolchain_pgo-profiles" "c2fe679f69cdc508e8af665352ff54774b130817^..d359806aca605184d5f7413bf0630320ce87eb59" &&
         mergePick "external/zlib" "https://android.googlesource.com/platform/external/zlib" "refs/changes/73/2901473/1" &&
-        cherryPickSha "external/zlib" "https://github.com/minaripenguin/android_external_zlib" "922d92dd206ce0b311e523695645be2a9864197a^..6510619fc778ac3a5ebdedef71ea942fdee430b4"
+        cherryPickSha "external/zlib" "https://github.com/minaripenguin/android_external_zlib" "6510619fc778ac3a5ebdedef71ea942fdee430b4^..922d92dd206ce0b311e523695645be2a9864197a"
 
         cat <<EOF
 ====================================================================
