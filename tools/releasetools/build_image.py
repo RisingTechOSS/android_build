@@ -170,12 +170,16 @@ def SetUpInDirAndFsConfig(origin_in, prop_dict):
   # Construct a staging directory of the root file system.
   in_dir = common.MakeTempDir()
   root_dir = prop_dict.get("root_dir")
-  if root_dir:
-    shutil.rmtree(in_dir)
-    shutil.copytree(root_dir, in_dir, symlinks=True)
+
+  if root_dir and os.path.exists(root_dir):
+      shutil.rmtree(in_dir)
+      shutil.copytree(root_dir, in_dir, symlinks=True)
   in_dir_system = os.path.join(in_dir, "system")
-  shutil.rmtree(in_dir_system, ignore_errors=True)
-  shutil.copytree(origin_in, in_dir_system, symlinks=True)
+  in_dir_system = in_dir_system.rstrip(os.path.sep + "root")
+
+  if os.path.exists(in_dir_system):
+      shutil.rmtree(in_dir_system, ignore_errors=True)
+      shutil.copytree(origin_in, in_dir_system, symlinks=True)
 
   # Change the mount point to "/".
   prop_dict["mount_point"] = "/"
