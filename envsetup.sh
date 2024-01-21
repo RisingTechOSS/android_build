@@ -2328,6 +2328,18 @@ EOF
     cd "$current_dir" || exit
 }
 
+function siesta() {
+    target_device="$1"
+    type="$2"
+    if [ -z "$type" ]; then
+        type="userdebug"
+    fi
+    if [ "$target_device" == "generic" ] || [ -z "$target_device" ]; then
+    	target_device="$(get_build_var RISING_DEVICE)"
+    fi
+    lunch "rising_$target_device-$type"
+}
+
 setup_ccache
 validate_current_shell
 set_global_paths
