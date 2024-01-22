@@ -263,7 +263,7 @@ function set_lunch_paths()
     # Note: on windows/cygwin, ANDROID_LUNCH_BUILD_PATHS will contain spaces
     # due to "C:\Program Files" being in the path.
 
-    # Handle compat with the old ANDROID_BUILD_PATHS variable. 
+    # Handle compat with the old ANDROID_BUILD_PATHS variable.
     # TODO: Remove this after we think everyone has lunched again.
     if [ -z "$ANDROID_LUNCH_BUILD_PATHS" -a -n "$ANDROID_BUILD_PATHS" ] ; then
       ANDROID_LUNCH_BUILD_PATHS="$ANDROID_BUILD_PATHS"
@@ -2114,7 +2114,7 @@ function setup_ccache() {
             export USE_CCACHE=1
             export CCACHE_EXEC=$(command -v ccache)
             [ -z "${CCACHE_DIR}" ] && export CCACHE_DIR="$HOME/.ccache"
-            echo "ccache directory found, CCACHE_DIR set to: $CCACHE_DIR" >&2 
+            echo "ccache directory found, CCACHE_DIR set to: $CCACHE_DIR" >&2
             CCACHE_MAXSIZE="${CCACHE_MAXSIZE:-40G}"
             DIRECT_MODE="${DIRECT_MODE:-false}"
             $CCACHE_EXEC -o compression=true -o direct_mode="${DIRECT_MODE}" -M "${CCACHE_MAXSIZE}" \
@@ -2176,7 +2176,7 @@ function ascend() {
         echo "Error: No device target set. Please use 'riseup' or 'lunch' to set the target device."
         return 1
     fi
-    
+
     if [[ "$1" == "fastboot" ]]; then
         m updatepackage
     else
@@ -2281,7 +2281,7 @@ function cherryPickSha() {
     repo_dir="$1"
     remote_url="$2"
     sha1sha2="$3"
-    fetchRemote "$repo_dir" "$remote_url" && 
+    fetchRemote "$repo_dir" "$remote_url" &&
     commits=$(git -C "$repo_dir" log --format="%H" "$sha1sha2")
     for commit in $commits; do
         if git -C "$repo_dir" cherry-pick "$commit" > /dev/null 2>&1; then
@@ -2304,6 +2304,7 @@ function opt_patch() {
 EOF
 
         mergePick "external/arm-optimized-routines" "https://github.com/ARM-software/optimized-routines" "" &&
+        cherryPick "external/arm-optimized-routines" "https://android.googlesource.com/platform/external/arm-optimized-routines" "refs/changes/03/2913603/1" &&
         cherryPick "packages/MusicFX" "https://android.googlesource.com/platform/packages/MusicFX" "refs/changes/34/2736934/3" &&
         cherryPick "system/server_configurable_flags" "https://android.googlesource.com/platform/system/server_configurable_flags" "refs/changes/85/2844985/2" &&
         cherryPick "external/boringssl" "https://android.googlesource.com/platform/external/boringssl" "refs/changes/06/2854406/2" &&
