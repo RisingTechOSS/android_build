@@ -2270,28 +2270,16 @@ function cherryPick() {
     fi
 }
 
-function fetchRemote() {
+function fetchReset() {
     repo_dir="$1"
     remote_url="$2"
-    git -C "$repo_dir" fetch "$remote_url"  > /dev/null 2>&1 &&
-    echo "Remote Fetched successfuly for $repo_dir"
+    git -C "$repo_dir" fetch "$remote_url" > /dev/null 2>&1 &&
+    git -C "$repo_dir" reset --hard FETCH_HEAD > /dev/null 2>&1
+    if [ $? -eq 0 ]; then
+        echo "Patch successfuly applied in $repo_dir"
+    fi
 }
 
-function cherryPickSha() {
-    repo_dir="$1"
-    remote_url="$2"
-    sha1sha2="$3"
-    fetchRemote "$repo_dir" "$remote_url" &&
-    commits=$(git -C "$repo_dir" log --format="%H" "$sha1sha2")
-    for commit in $commits; do
-        if git -C "$repo_dir" cherry-pick "$commit" > /dev/null 2>&1; then
-            echo "Patch: $commit successfully applied in $repo_dir"
-        else
-            git -C "$repo_dir" cherry-pick --skip > /dev/null 2>&1
-            echo "Patch: $commit already applied for $repo_dir. Skipping automated patching"
-        fi
-    done
-}
 
 function opt_patch() {
     current_dir=$(pwd)
@@ -2310,12 +2298,11 @@ EOF
         cherryPick "external/boringssl" "https://android.googlesource.com/platform/external/boringssl" "refs/changes/06/2854406/2" &&
         cherryPick "system/linkerconfig" "https://android.googlesource.com/platform/system/linkerconfig" "refs/changes/51/2855451/1" &&
         cherryPick "prebuilts/abi-dumps/ndk" "https://android.googlesource.com/platform/prebuilts/abi-dumps/ndk" "refs/changes/39/2902239/2" &&
-        cherryPickSha "external/sqlite" "https://github.com/minaripenguin/android_external_sqlite" "160f0f83cb3a07278500acbea73c6dcff7f178f0^..dc255e90cfd1215e8c941122e74a1ca7a839d37a" &&
-        cherryPickSha "build/bazel" "https://github.com/minaripenguin/android_build_bazel" "6de40452f0c7b50d692f4a7074cfec637d293853^..e2c53f8cedd165510c3781563d370aa6e99af84b" &&
-        cherryPickSha "hardware/interfaces" "https://github.com/minaripenguin/android_hardware_interfaces" "d1d0b6b21992451def6c6c8e3f4229f0a783ea38^..2e64344c74bb11e55bb80152080f3c2427cba9a4" &&
-        cherryPickSha "toolchain/pgo-profiles" "https://github.com/minaripenguin/android_toolchain_pgo-profiles" "c2fe679f69cdc508e8af665352ff54774b130817^..d359806aca605184d5f7413bf0630320ce87eb59" &&
-        mergePick "external/zlib" "https://android.googlesource.com/platform/external/zlib" "refs/changes/73/2901473/1" &&
-        cherryPickSha "external/zlib" "https://github.com/minaripenguin/android_external_zlib" "6510619fc778ac3a5ebdedef71ea942fdee430b4^..922d92dd206ce0b311e523695645be2a9864197a"
+        fetchReset "external/sqlite" "https://github.com/minaripenguin/android_external_sqlite" &&
+        fetchReset "build/bazel" "https://github.com/minaripenguin/android_build_bazel"  &&
+        fetchReset "hardware/interfaces" "https://github.com/minaripenguin/android_hardware_interfaces" &&
+        fetchReset "toolchain/pgo-profiles" "https://github.com/minaripenguin/android_toolchain_pgo-profiles" &&
+        fetchReset "external/zlib" "https://github.com/minaripenguin/android_external_zlib"
 
         cat <<EOF
 ====================================================================
