@@ -2316,16 +2316,59 @@ EOF
     cd "$current_dir" || exit
 }
 
-function siesta() {
-    target_device="$1"
-    type="$2"
-    if [ -z "$type" ]; then
-        type="userdebug"
-    fi
-    if [ "$target_device" == "generic" ] || [ -z "$target_device" ]; then
-    	target_device="$(get_build_var RISING_DEVICE)"
-    fi
-    lunch "rising_$target_device-$type"
+function add_remote() {
+    local remote_name="$1"
+    local manifest_path="android/snippets/rising.xml"
+    # exclude ota, manifest and gitlab repositories
+    local exclusion_list=("android" "vendor/risingOTA" "packages/apps/FaceUnlock" "vendor/gms")
+    echo "Adding remote '$remote_name' to repositories in manifest: $manifest_path"
+    while IFS= read -r line; do
+        if [[ $line == *"<project "* && $line == *"remote="* ]]; then
+            local repo_path=$(echo "$line" | grep -oP 'path="\K[^"]+')
+            local existing_remote=$(echo "$line" | grep -oP 'remote="\K[^"]+')
+            local remote_url="https://github.com/$(echo "$line" | grep -oP 'name="\K[^"]+')"
+            if [[ " ${exclusion_list[@]} " =~ " $repo_path " ]]; then
+                echo "Repository '$repo_path' is in the exclusion list. Skipping..."
+                continue
+            fi
+            if ! git -C "$repo_path" remote | grep -q "^$remote_name$"; then
+                git -C "$repo_path" remote add "$remote_name" "$remote_url"
+                echo "Added remote '$remote_name' with URL '$remote_url' to repository: $repo_path"
+            else
+                echo "Remote '$remote_name' already exists in repository: $repo_path, URL: $remote_url"
+            fi
+        fi
+    done < "$manifest_path"
+}
+
+function force_push() {
+    local remote_name="$1"
+    local remote_branch="$2"
+    local manifest_path="android/snippets/rising.xml"
+    # exclude ota, manifest and gitlab repositories
+    local exclusion_list=("android" "vendor/risingOTA" "packages/apps/FaceUnlock" "vendor/gms")
+    echo "Pushing changes to remote '$remote_name' in repositories from manifest: $manifest_path"
+    while IFS= read -r line; do
+        if [[ $line == *"<project "* && $line == *"remote="* ]]; then
+            local repo_path=$(echo "$line" | grep -oP 'path="\K[^"]+')
+            local remote=$(echo "$line" | grep -oP 'remote="\K[^"]+')
+            local branch=$(echo "$line" | grep -oP 'revision="\K[^"]+')
+            if [[ " ${exclusion_list[@]} " =~ " $repo_path " ]]; then
+                echo "Repository '$repo_path' is in the exclusion list. Skipping..."
+                continue
+            fi
+            if ! git -C "$repo_path" rev-parse --verify "$branch" &> /dev/null; then
+                echo "Creating and checking out branch '$branch' in repository: $repo_path"
+                git -C "$repo_path" checkout -b "$branch"
+            else
+                echo "Branch '$branch' already exists in repository: $repo_path"
+            fi
+            if [[ -n "$remote_branch" ]]; then
+                branch="$remote_branch"
+            fi
+            git -C "$repo_path" push -f "$remote_name" "$branch"
+        fi
+    done < "$manifest_path"
 }
 
 setup_ccache
