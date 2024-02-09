@@ -1309,6 +1309,7 @@ ifeq ($(HOST_OS),darwin)
 else ifdef FULL_BUILD
   ifneq (true,$(ALLOW_MISSING_DEPENDENCIES))
     # Check to ensure that all modules in PRODUCT_PACKAGES exist (opt in per product)
+    PRODUCT_ENFORCE_PACKAGES_EXIST := false
     ifeq (true,$(PRODUCT_ENFORCE_PACKAGES_EXIST))
       _allow_list := $(PRODUCT_ENFORCE_PACKAGES_EXIST_ALLOW_LIST)
       _modules := $(PRODUCT_PACKAGES)
