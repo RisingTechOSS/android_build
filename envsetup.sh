@@ -2298,6 +2298,7 @@ function opt_patch() {
 ====================================================================
 EOF
 
+        cherryPick "device/qcom/sepolicy" "https://github.com/minaripenguin/android_device_qcom_sepolicy" "" &&
         cherryPick "packages/modules/DeviceLock" "https://github.com/minaripenguin/android_packages_modules_DeviceLock" "" &&
         cherryPick "packages/apps/MusicFX" "https://android.googlesource.com/platform/packages/MusicFX" "refs/changes/34/2736934/3" &&
         cherryPick "system/server_configurable_flags" "https://android.googlesource.com/platform/system/server_configurable_flags" "refs/changes/85/2844985/2" &&
