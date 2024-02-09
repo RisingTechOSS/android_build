@@ -2248,7 +2248,7 @@ function mergePick() {
     git -C "$repo_dir" fetch "$remote_url" "$change_ref" > /dev/null 2>&1 &&
     git -C "$repo_dir" merge FETCH_HEAD > /dev/null 2>&1
     if [ $? -eq 0 ]; then
-        echo "Merge Patch successfuly applied in $repo_dir"
+        echo "Merge Patch successfully applied in $repo_dir"
     else
         git -C "$repo_dir" merge --abort > /dev/null 2>&1
         echo "Merge Patch already applied for $repo_dir. Skipping automated patching"
@@ -2263,7 +2263,7 @@ function cherryPick() {
     git -C "$repo_dir" fetch "$remote_url" "$change_ref" > /dev/null 2>&1 &&
     git -C "$repo_dir" cherry-pick FETCH_HEAD > /dev/null 2>&1
     if [ $? -eq 0 ]; then
-        echo "Patch successfuly applied in $repo_dir"
+        echo "Patch successfully applied in $repo_dir"
     else
         git -C "$repo_dir" cherry-pick --skip > /dev/null 2>&1
         echo "Patch already applied for $repo_dir. Skipping automated patching"
@@ -2273,13 +2273,20 @@ function cherryPick() {
 function fetchReset() {
     repo_dir="$1"
     remote_url="$2"
-    git -C "$repo_dir" fetch "$remote_url" > /dev/null 2>&1 &&
-    git -C "$repo_dir" reset --hard FETCH_HEAD > /dev/null 2>&1
-    if [ $? -eq 0 ]; then
-        echo "Patch successfuly applied in $repo_dir"
+    git -C "$repo_dir" fetch "$remote_url" > /dev/null 2>&1
+    current_commit=$(git -C "$repo_dir" rev-parse HEAD)
+    fetch_head_commit=$(git -C "$repo_dir" rev-parse FETCH_HEAD)
+    if [ "$current_commit" = "$fetch_head_commit" ]; then
+        echo "Repository is already up to date in $repo_dir"
+    else
+        git -C "$repo_dir" reset --hard FETCH_HEAD > /dev/null 2>&1
+        if [ $? -eq 0 ]; then
+            echo "Patch successfully applied in $repo_dir"
+        else
+            echo "Failed to apply patch in $repo_dir"
+        fi
     fi
 }
-
 
 function opt_patch() {
     current_dir=$(pwd)
@@ -2291,7 +2298,8 @@ function opt_patch() {
 ====================================================================
 EOF
 
-        cherryPick "packages/MusicFX" "https://android.googlesource.com/platform/packages/MusicFX" "refs/changes/34/2736934/3" &&
+        cherryPick "packages/modules/DeviceLock" "https://github.com/minaripenguin/android_packages_modules_DeviceLock" "" &&
+        cherryPick "packages/apps/MusicFX" "https://android.googlesource.com/platform/packages/MusicFX" "refs/changes/34/2736934/3" &&
         cherryPick "system/server_configurable_flags" "https://android.googlesource.com/platform/system/server_configurable_flags" "refs/changes/85/2844985/2" &&
         cherryPick "external/boringssl" "https://android.googlesource.com/platform/external/boringssl" "refs/changes/06/2854406/2" &&
         cherryPick "system/linkerconfig" "https://android.googlesource.com/platform/system/linkerconfig" "refs/changes/51/2855451/1" &&
