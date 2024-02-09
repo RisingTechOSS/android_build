@@ -2291,13 +2291,12 @@ function opt_patch() {
 ====================================================================
 EOF
 
-        mergePick "external/arm-optimized-routines" "https://github.com/ARM-software/optimized-routines" "" &&
-        cherryPick "external/arm-optimized-routines" "https://android.googlesource.com/platform/external/arm-optimized-routines" "refs/changes/03/2913603/1" &&
         cherryPick "packages/MusicFX" "https://android.googlesource.com/platform/packages/MusicFX" "refs/changes/34/2736934/3" &&
         cherryPick "system/server_configurable_flags" "https://android.googlesource.com/platform/system/server_configurable_flags" "refs/changes/85/2844985/2" &&
         cherryPick "external/boringssl" "https://android.googlesource.com/platform/external/boringssl" "refs/changes/06/2854406/2" &&
         cherryPick "system/linkerconfig" "https://android.googlesource.com/platform/system/linkerconfig" "refs/changes/51/2855451/1" &&
         cherryPick "prebuilts/abi-dumps/ndk" "https://android.googlesource.com/platform/prebuilts/abi-dumps/ndk" "refs/changes/39/2902239/2" &&
+        fetchReset "external/arm-optimized-routines" "https://github.com/minaripenguin/android_external_arm-optimized-routines" &&
         fetchReset "external/sqlite" "https://github.com/minaripenguin/android_external_sqlite" &&
         fetchReset "build/bazel" "https://github.com/minaripenguin/android_build_bazel"  &&
         fetchReset "hardware/interfaces" "https://github.com/minaripenguin/android_hardware_interfaces" &&
