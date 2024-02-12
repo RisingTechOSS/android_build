@@ -2145,12 +2145,12 @@ function setup_ccache() {
 function riseupload() {
     read -p "Enter your SourceForge username: " sf_username
     read -p "Enter the output filename (without .zip extension): " filename
-    read -p "Enter the package build type (fastboot or ota): " buildtype
     target_device="$(get_build_var TARGET_DEVICE)"
     package_type="$(get_build_var RISING_PACKAGE_TYPE)"
+    upload_version=$(echo "$(get_build_var RISING_VERSION)" | cut -d'.' -f1).x
     product_out="out/target/product/$target_device/"
     source_file="$product_out/${filename}.zip"
-    destination="${sf_username}@frs.sourceforge.net:/home/frs/project/risingos-official/1.x/$package_type/${buildtype}/$target_device/"
+    destination="${sf_username}@frs.sourceforge.net:/home/frs/project/risingos-official/$upload_version/$package_type/$target_device/"
     rsync -e ssh "$source_file" "$destination"
 }
 
