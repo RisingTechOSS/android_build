@@ -1390,12 +1390,6 @@ else ifdef FULL_BUILD
   product_target_FILES := $(call product-installed-files, $(INTERNAL_PRODUCT))
   # WARNING: The product_MODULES variable is depended on by external files.
   product_MODULES := $(_pif_modules)
-
-  # Verify the artifact path requirements made by included products.
-  is_asan := $(if $(filter address,$(SANITIZE_TARGET)),true)
-  ifeq (,$(or $(is_asan),$(DISABLE_ARTIFACT_PATH_REQUIREMENTS)))
-    include $(BUILD_SYSTEM)/artifact_path_requirements.mk
-  endif
 else
   # We're not doing a full build, and are probably only including
   # a subset of the module makefiles.  Don't try to build any modules
